@@ -2,6 +2,12 @@
 
   session_start(); 
 
+
+
+
+  
+
+
  ?>
 
 
@@ -45,7 +51,171 @@
                       <h6 style="text-transform: uppercase;padding: 20px;color: #4D88FF;font-size: 21px; font-family:Times New Roman,Times, serif"> Create Account  </h6>
 
                       </div>
-                      <div style="display: flex;align-items: center;justify-content: center;"><?php registerUser(); ?></div>
+                      <div style="display: flex;align-items: center;justify-content: center;">
+   <?php 
+
+
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+// Load Composer's autoloader
+require 'vendor/autoload.php';
+
+// Instantiation and passing `true` enables exceptions
+$mail = new PHPMailer(true);
+
+
+try {
+    //Server settings
+    $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
+    $mail->isSMTP();                                            // Send using SMTP
+    $mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
+    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+    $mail->Username   = 'frimprincy@gmail.com';                     // SMTP username
+    $mail->Password   = 'pope@0504';                               // SMTP password
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+    $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+
+    //Recipients
+    $mail->setFrom('frimprincy@gmail.com', 'Mailer');
+    $mail->addAddress('frimprince44@yahoo.com', 'Joe User');     // Add a recipient
+     
+
+
+
+    // Content
+    $mail->isHTML(true);                                  // Set email format to HTML
+    $mail->Subject = 'Here is the subject';
+    $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+   if($mail->send()) {
+   	echo 'Message has been sent';
+   }else{
+   	echo 'Message has not been sent';
+   }
+    
+} catch (Exception $e) {
+    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+}
+
+
+
+   	global $conn;
+       echo "<script> let timerInterval
+Swal.fire({
+  title: 'Ekeng Electronics!',
+  html: 'Loading Page.<b></b>',
+  timer: 400,
+  timerProgressBar: true,
+  onBeforeOpen: () => {
+    Swal.showLoading()
+    timerInterval = setInterval(() => {
+      const content = Swal.getContent()
+      if (content) {
+        const b = content.querySelector('b')
+        if (b) {
+          b.textContent = Swal.getTimerLeft()
+        }
+      }
+    }, 100)
+  },
+  onClose: () => {
+    clearInterval(timerInterval)
+  }
+}).then((result) => {
+  /* Read more about handling dismissals below */
+  if (result.dismiss === Swal.DismissReason.timer) {
+    console.log('I was closed by the timer')
+  }
+})</script>";
+      
+  	if(isset($_POST['createAccount'])){
+      $fname=mysqli_real_escape_string($conn,$_POST['fname']);
+       $surname=mysqli_real_escape_string($conn,$_POST['surname']);
+        $DOB=mysqli_real_escape_string($conn,$_POST['DOB']);
+         $contact=mysqli_real_escape_string($conn,$_POST['contact']);
+          $email=mysqli_real_escape_string($conn,$_POST['email']);
+           $cardID=mysqli_real_escape_string($conn,$_POST['cardID']);
+            $idnum=mysqli_real_escape_string($conn,$_POST['idnum']);
+             $institution=mysqli_real_escape_string($conn,$_POST['institution']);
+              $institutionName=mysqli_real_escape_string($conn,$_POST['institutionName']);
+               $studentNo=mysqli_real_escape_string($conn,$_POST['studentNo']);
+                $ezwich=mysqli_real_escape_string($conn,$_POST['ezwich']);
+                $academicyear=mysqli_real_escape_string($conn,$_POST['year']);
+                $fullName=$fname. ' ' .$surname;
+                 $keyLength=8;
+  	             $str="1234567890abcdefghijklmnopqrstuvwsyz!$@";
+  	             $randstrPass=substr(str_shuffle($str),0,$keyLength);
+                 $CardId=10;
+                 $academicyearId=7;
+                   
+
+                 $findExistUser="SELECT * FROM customer WHERE  email='$email'  || id_number='$idnum' ";
+                 $run_findExistUser=mysqli_query($conn,$findExistUser);
+                 $countUser=mysqli_num_rows($run_findExistUser);
+
+                 if(isset($_POST['checkbox'])){
+
+                 if ($countUser>0) {
+                 	  	echo "<div class='alert alert-danger' role='alert'>
+                           USER ALREADY EXIST!
+                            </div>";
+                 }else{
+                         $randId= generateKey();
+                         $repeat="cs10";
+                         $repeatId=$repeat.$randId;
+
+                        $cardID="SELECT id FROM id_type WHERE name='$cardID' ";
+                        $run_cardID=mysqli_query($conn,$cardID);
+                        while ($row=mysqli_fetch_array($run_cardID)) {
+                        	$CardId=$row["id"];
+
+                        }
+                     
+                     $institution="SELECT id FROM institution WHERE name='$institution'";
+                        $run_institution=mysqli_query($conn,$institution);
+                        while ($row=mysqli_fetch_array($run_institution)) {
+                        	$institutionId=$row["id"];
+                        }
+
+                      $academicyear="SELECT id FROM academicyear WHERE academicYear='$academicyear'";
+                        $run_academicyear=mysqli_query($conn,$academicyear);
+                        while ($row=mysqli_fetch_array($run_academicyear)) {
+                        	$academicyearId=$row["id"];
+                        }
+
+
+                 	$insertCustomer="INSERT INTO 
+                 	customer(fname,sname,DOB,contact,email,cardTypeId,id_number,institutionId,	institutionName,studentId,ezwich_num,startDate,lastUpdated,customerId,password,fullName,yearId) 
+                 	VALUES
+                 	('$fname','$surname','$DOB','$contact','$email','$CardId','$idnum',
+                 	'$institutionId','$institutionName','$studentNo','$ezwich',now(),now(),'$repeatId','$randstrPass','$fullName','$academicyearId')";
+
+
+                 	$run_insertCustomer=mysqli_query($conn,$insertCustomer);
+
+
+                 	if($run_insertCustomer){
+                              
+                            
+                 	}else{
+                 		
+             	echo  "<script>swal.fire({
+                                 title: 'Oops',
+                                 text: 'Registration Failled.Contact Us ',
+                                 icon: 'error',
+                       
+                                   });</script>";
+                 	}
+                 }
+             }
+
+  	}
+  
+ ?></div>
                       <br>
                     <form id="myForm"  method="post" class="creditly-card-form agileinfo_form">
 			            <section class="creditly-wrapper wthree, w3_agileits_wrapper">
